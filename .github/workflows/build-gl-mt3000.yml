@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout source
@@ -14,28 +14,32 @@ jobs:
     - name: Set up environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git ccache gettext libssl-dev xsltproc rsync wget unzip python3 python3-pip python3-setuptools python3-distutils
+        sudo apt-get install -y python3-pip
+        python3 -m ensurepip
+        python3 -m pip install setuptools
 
     - name: Download ImageBuilder
       run: |
-        wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-        tar -Jxf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-        mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic imagebuilder
+        wget https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/filogic/openwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        tar -Jxf openwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        mv openwrt-imagebuilder-23.05.0-mediatek-filogic imagebuilder
 
     - name: Copy files into ImageBuilder
       run: |
         cp -r files imagebuilder/files || true
+        cp -r customfeeds.conf imagebuilder/feeds.conf.default || true
 
     - name: Run Build
       run: |
         cd imagebuilder
-        make image PROFILE=glinet_gl-mt3000 PACKAGES="luci luci-ssl clash ip-full bash curl wget ipset dnsmasq-full coreutils tar gzip p7zip unzip" FILES=files
+        make image PROFILE="gl-mt3000" PACKAGES="luci luci-ssl luci-app-upnp iperf3 ipset kmod-mt7921e kmod-mt7921u kmod-usb-net kmod-usb-net-cdc-ncm kmod-usb-net-cdc-ether kmod-usb-net-huawei-cdc-ncm kmod-usb-net-ipheth kmod-usb-net-kalmia kmod-usb-net-mcs7830 kmod-usb-net-rtl8150 kmod-usb-net-rtl8152"
 
     - name: Upload firmware
       uses: actions/upload-artifact@v3
       with:
         name: firmware
         path: imagebuilder/bin/targets/*/*/*.bin
+
 
 
 
