@@ -1,44 +1,51 @@
-port: 7890
-socks-port: 7891
-redir-port: 7892
-mixed-port: 7893
-allow-lan: true
-bind-address: "*"
-mode: rule
-log-level: info
-ipv6: false
+name: Build GL-MT3000 ImmortalWrt
 
-dns:
-  enable: true
-  listen: 0.0.0.0:7874
-  enhanced-mode: fake-ip
-  default-nameserver: [1.1.1.1, 8.8.8.8]
-  nameserver: [https://1.1.1.1/dns-query]
-  fallback: [https://8.8.8.8/dns-query]
+on:
+  workflow_dispatch:
 
-proxies:
-  - name: "MyVLESS"
-    type: vless
-    server: 144.202.113.155
-    port: 443
-    uuid: 378e1350-afa5-4042-afc9-d9d92667906a
-    tls: true
-    network: tcp
-    client-fingerprint: chrome
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-proxy-groups:
-  - name: "AUTO"
-    type: select
-    proxies:
-      - MyVLESS
-      - DIRECT
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libncurses5-dev \
+            zlib1g-dev \
+            gawk \
+            git \
+            wget \
+            unzip \
+            python3 \
+            python3-pip
 
-rules:
-  - DOMAIN-KEYWORD,tiktok,AUTO
-  - DOMAIN-SUFFIX,youtube.com,AUTO
-  - DOMAIN-SUFFIX,google.com,AUTO
-  - GEOIP,CN,DIRECT
-  - MATCH,AUTO
+      - name: Download ImageBuilder
+        run: |
+          wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+          tar -xvf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+          mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64 imagebuilder
+
+      - name: Copy files into ImageBuilder
+        run: |
+          mkdir -p imagebuilder/files
+          cp -r ./files/* imagebuilder/files/ || true
+
+      - name: Run Build
+        run: |
+          cd imagebuilder
+          make image PROFILE=glinet_gl-mt3000 PACKAGES="curl bash" FILES=files/
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: GL-MT3000-firmware
+          path: imagebuilder/bin/targets/**/**/*.bin
+
 
 
 
