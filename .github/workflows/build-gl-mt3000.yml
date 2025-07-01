@@ -6,26 +6,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Set up job
-      run: mkdir imagebuilder
+      - name: Set up job
+        run: echo "Starting build..."
 
-    - name: Download ImageBuilder
-      run: |
-        curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/snapshots/targets/mediatek/filogic/immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz
-        tar -xJf imagebuilder.tar.xz -C imagebuilder --strip-components=1
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 python3-distutils xz-utils file
 
-    - name: Run Build
-      run: |
-        cd imagebuilder
-        make image PROFILE="gl-mt3000" PACKAGES="luci luci-ssl iperf3 ipset curl bash kmod-usb-net kmod-mt7921e" FILES=files/
+      - name: Download ImageBuilder
+        run: |
+          mkdir imagebuilder
+          curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/snapshots/targets/mediatek/filogic/immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz
+          tar -C imagebuilder --strip-components=1 -xJf imagebuilder.tar.xz
 
-    - name: Upload firmware
-      uses: actions/upload-artifact@v4
-      with:
-        name: firmware
-        path: imagebuilder/bin/targets/
+      - name: Copy files into ImageBuilder
+        run: |
+          mkdir -p imagebuilder/files/etc/
+          echo "Custom files go here" > imagebuilder/files/etc/banner
+
+      - name: Run Build Script
+        run: |
+          cd imagebuilder
+          make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl bash curl wget iperf3" FILES=files/
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: imagebuilder/bin/targets/*/*/*.bin
+
 
 
 
