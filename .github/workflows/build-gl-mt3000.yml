@@ -1,4 +1,4 @@
-name: Build GL-MT3000 ImmortalWrt
+name: Build GL‑MT3000 ImmortalWrt
 
 on:
   workflow_dispatch:
@@ -13,22 +13,28 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y curl unzip xz-utils
+          sudo apt install -y curl xz-utils unzip
 
       - name: Download ImageBuilder
         run: |
+          curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/releases/24.10.0/targets/mediatek/filogic/immortalwrt-imagebuilder-24.10.0-mediatek-filogic.Linux‑x86_64.tar.zst
           mkdir imagebuilder
-          curl -L -o ib.tar.xz https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/mediatek_filogic-glinet_gl-mt3000-immortalwrt-imagebuilder-20230915.tar.xz
-          tar -xf ib.tar.xz -C imagebuilder --strip-components=1
+          tar -x --zstd -f imagebuilder.tar.xz -C imagebuilder --strip-components=1
 
       - name: Copy files into ImageBuilder
         run: |
           mkdir -p imagebuilder/files
-          cp -rf files/* imagebuilder/files/
+          cp -r files/* imagebuilder/files/
 
       - name: Run Build Script
         run: |
-          chmod +x ./mediatek-filogic/build.sh
-          PROFILE=glinet_gl-mt3000 ENABLE_PPPOE=false PPPOE_ACCOUNT=none PPPOE_PASSWORD=none INCLUDE_DOCKER=yes ./mediatek-filogic/build.sh
+          chmod +x mediatek-filogic/build.sh
+          cd imagebuilder
+          PROFILE=glinet_gl-mt3000 \
+          ENABLE_PPPOE=false \
+          PPPOE_ACCOUNT=none \
+          PPPOE_PASSWORD=none \
+          INCLUDE_DOCKER=yes \
+          ../mediatek-filogic/build.sh
 
 
