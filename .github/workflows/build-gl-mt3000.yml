@@ -26,7 +26,7 @@ jobs:
 
       - name: Download ImageBuilder
         run: |
-          wget https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+          wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
           tar -xvf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
           mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic.* imagebuilder
 
@@ -44,6 +44,7 @@ jobs:
         with:
           name: GL-MT3000-firmware
           path: imagebuilder/bin/targets/*/*/*.bin
+
 
 
 
