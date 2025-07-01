@@ -28,7 +28,7 @@ jobs:
           cd imagebuilder
           curl -LO https://downloads.immortalwrt.org/releases/23.05.4/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.4-mediatek-filogic.Linux-x86_64.tar.xz
           tar -xJf immortalwrt-imagebuilder-23.05.4-mediatek-filogic.Linux-x86_64.tar.xz
-          mv immortalwrt-imagebuilder-23.05.4-mediatek-filogic.* builder
+          mv immortalwrt-imagebuilder-23.05.4-mediatek-filogic.Linux-x86_64 builder
 
       - name: Copy files into ImageBuilder
         run: |
@@ -41,11 +41,8 @@ jobs:
             PACKAGES="luci luci-ssl luci-app-openclash curl wget iperf3 ip-full ipset iptables" \
             FILES=files
 
-      - name: Post Checkout
-        run: echo "Build completed"
-
-      - name: Complete job
-        run: echo "Done!"
+      - name: Complete
+        run: echo "Build finished"
 
 
 
