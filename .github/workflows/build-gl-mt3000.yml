@@ -17,28 +17,29 @@ jobs:
 
     - name: Download ImageBuilder
       run: |
-        mkdir imagebuilder
+        mkdir -p imagebuilder
         cd imagebuilder
-        curl -L -o ib.tar.xz https://downloads.immortalwrt.org/releases/23.05-SNAPSHOT/targets/mediatek/filogic/immortalwrt-23.05-snapshot-*-mediatek-filogic-imagebuilder-*.tar.xz
-        tar xJf ib.tar.xz
+        curl -L -o ib.tar.xz https://downloads.immortalwrt.org/releases/23.05-SNAPSHOT/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05-SNAPSHOT-mediatek-filogic.Linux-x86_64.tar.xz
+        tar -xJf ib.tar.xz
+        mv immortalwrt-imagebuilder-* builder
 
-    - name: Copy pre‑config files
+    - name: Prepare files
       run: |
         mkdir -p imagebuilder/builder/files
-        # Add any files into builder/files/ if needed
+        # Add any custom config files into imagebuilder/builder/files if needed
 
     - name: Run Build
       run: |
         cd imagebuilder/builder
-        make image PROFILE=gl-mt3000 \
-          PACKAGES="luci openssl kmod-usb-core" \
-          FILES=files
+        make info
+        make image PROFILE=gl-mt3000 PACKAGES="luci" FILES=files
 
     - name: Upload firmware
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: gl-mt3000-firmware
+        name: firmware
         path: imagebuilder/builder/bin/targets/mediatek/filogic/*.bin
+
 
 
 
