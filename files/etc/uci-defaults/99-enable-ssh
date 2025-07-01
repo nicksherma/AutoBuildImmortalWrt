@@ -1,0 +1,6 @@
+#!/bin/sh
+uci set dropbear.@dropbear[0].enable=1
+uci commit dropbear
+/etc/init.d/dropbear enable
+/etc/init.d/dropbear start
+passwd -d root
