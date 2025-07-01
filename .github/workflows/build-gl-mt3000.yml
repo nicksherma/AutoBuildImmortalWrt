@@ -5,37 +5,33 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
-      - name: Set up job
-        run: echo "Starting build..."
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl tar xz-utils python3-pip python3-setuptools
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip python3 python3-distutils xz-utils file
+    - name: Download ImageBuilder
+      run: |
+        mkdir imagebuilder
+        cd imagebuilder
+        curl -LO https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        tar -xvf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64 builder
 
-      - name: Download ImageBuilder
-        run: |
-          mkdir imagebuilder
-          curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/snapshots/targets/mediatek/filogic/immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz
-          tar -C imagebuilder --strip-components=1 -xJf imagebuilder.tar.xz
+    - name: Run Build
+      run: |
+        cd imagebuilder/builder
+        make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl ip-full iperf3 curl bash coreutils screen htop nano openssh-sftp-server ca-certificates kmod-tun kmod-usb-net kmod-usb-net-cdc-ether kmod-mt7921e"
 
-      - name: Copy files into ImageBuilder
-        run: |
-          mkdir -p imagebuilder/files/etc/
-          echo "Custom files go here" > imagebuilder/files/etc/banner
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: GL-MT3000-Firmware
+        path: imagebuilder/builder/bin/targets/mediatek/filogic/*.bin
 
-      - name: Run Build Script
-        run: |
-          cd imagebuilder
-          make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl bash curl wget iperf3" FILES=files/
-
-      - name: Upload firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: imagebuilder/bin/targets/*/*/*.bin
 
 
 
