@@ -9,36 +9,37 @@ jobs:
 
     steps:
       - name: Set up job
-        run: echo "Setting up build job..."
+        run: echo "Job started"
 
       - name: Set up environment
         run: |
-          sudo apt update
-          sudo apt install -y build-essential libncurses5-dev gawk git \
-            subversion libssl-dev gettext unzip file python3 python3-pip wget curl
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison g++ gawk \
+            gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev \
+            python3-distutils rsync unzip zlib1g-dev file wget python3
 
       - name: Download ImageBuilder
         run: |
           wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
           tar -Jxf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-          mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic imagebuilder
+          DIR=$(tar -tf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz | head -1 | cut -f1 -d"/")
+          mv "$DIR" imagebuilder
 
       - name: Copy files into ImageBuilder
         run: |
-          mkdir -p imagebuilder/files/etc
-          # Optionally add your own files like configs here
+          mkdir -p imagebuilder/files/etc/config
+          echo "custom config here" > imagebuilder/files/etc/config/custom.conf
 
       - name: Run Build
         run: |
           cd imagebuilder
-          make image PROFILE="glinet_gl-mt3000" PACKAGES="luci luci-ssl dnsmasq-full iptables ip6tables \
-          kmod-tun curl ca-certificates bash coreutils libustream-openssl -libustream-mbedtls"
-
+          make image PROFILE="gl-mt3000" PACKAGES="luci luci-ssl curl ip-full"
+      
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: gl-mt3000-firmware
-          path: imagebuilder/bin/targets/mediatek/filogic/*.bin
+          path: imagebuilder/bin/targets/*/*/*.bin
 
 
 
