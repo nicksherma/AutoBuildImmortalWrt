@@ -9,12 +9,11 @@ jobs:
 
     steps:
     - name: Set up job
-      run: |
-        mkdir imagebuilder
+      run: mkdir imagebuilder
 
     - name: Download ImageBuilder
       run: |
-        curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/snapshots/targets/mediatek/filogic/immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz
         tar -xJf imagebuilder.tar.xz -C imagebuilder --strip-components=1
 
     - name: Run Build
@@ -27,6 +26,7 @@ jobs:
       with:
         name: firmware
         path: imagebuilder/bin/targets/
+
 
 
 
