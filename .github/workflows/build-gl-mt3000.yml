@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -13,21 +14,26 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y curl unzip tar zstd
+          sudo apt install -y curl unzip zstd
 
       - name: Download ImageBuilder
         run: |
           mkdir imagebuilder
-          curl -L -o ib.tar.zst https://downloads.immortalwrt.org/releases/23.05.3/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.zst
-          tar -I zstd -xf ib.tar.zst -C imagebuilder --strip-components=1
+          curl -Lo - https://downloads.immortalwrt.org/releases/23.05.3/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.zst \
+          | zstd -d | tar -xvf - -C imagebuilder --strip-components=1
 
       - name: Copy files into ImageBuilder
         run: |
-          cp -r files/ imagebuilder/files
+          cp -rf files imagebuilder/files
 
       - name: Run Build Script
         run: |
-          cd ./imagebuilder
-          PROFILE=glinet_gl-mt3000 ENABLE_PPPOE=false PPPOE_ACCOUNT=none PPPOE_PASSWORD=none INCLUDE_DOCKER=yes ../mediatek-filogic/build.sh
-
-
+          cd imagebuilder
+          make image PROFILE=glinet_gl-mt3000 \
+            ENABLE_IPV6=y \
+            ENABLE_WIFI=y \
+            PACKAGES="luci luci-ssl luci-app-openclash luci-app-homeproxy ip-full ipset iptables iptables-mod-tproxy \
+            iptables-mod-extra iptables-mod-socket iptables-mod-ipopt kmod-inet-diag kmod-tun kmod-macvlan \
+            kmod-nf-nathelper kmod-nf-nathelper-extra kmod-nft-socket kmod-sched-core luci-app-firewall \
+            luci-app-ttyd luci-app-sqm luci-theme-argon openssh-sftp-server" \
+            FILES=files/
