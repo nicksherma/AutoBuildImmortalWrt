@@ -7,23 +7,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Set up job
+        run: echo "Starting build job..."
 
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y curl unzip tar zstd
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Download ImageBuilder
-      run: |
-        mkdir imagebuilder
-        curl -L https://downloads.immortalwrt.org/releases/23.05.3/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.zst | zstd -d | tar -xvf - -C imagebuilder --strip-components=1
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncurses5-dev \
+          zlib1g-dev gawk git gettext libssl-dev xsltproc wget unzip \
+          python3 python3-distutils rsync curl zstd
 
-    - name: Copy files into ImageBuilder
-      run: |
-        cp -r files/ imagebuilder/files
+      - name: Download ImageBuilder
+        run: |
+          mkdir imagebuilder
+          curl -L https://downloads.immortalwrt.org/releases/23.05.3/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.zst \
+          | zstd -d | tar -xvf - -C imagebuilder --strip-components=1
 
-    - name: Run Build Script
-      run: |
-        cd imagebuilder
-        make image PROFILE=glinet_gl-mt3000 ENABLE_IPV6=y ENABLE_WIFI=y
+      - name: Copy files into ImageBuilder
+        run: |
+          mkdir -p imagebuilder/files/etc
+          cp -r ./files/* imagebuilder/files/ || true
+
+      - name: Run Build Script
+        run: |
+          cd imagebuilder
+          make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl curl bash ip-full ipset iptables ppp \
+          ppp-mod-pppoe kmod-usb-storage kmod-usb3 kmod-fs-ext4 kmod-fs-vfat block-mount \
+          e2fsprogs fdisk kmod-nft-core kmod-nft-nat kmod-nft-offload \
+          kmod-wireguard luci-app-openclash luci-app-firewall"
+
+      - name: Post Checkout
+        run: echo "Build completed."
+
+
 
