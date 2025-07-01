@@ -5,38 +5,40 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+    - name: Set up job
+      run: echo "Starting build..."
 
-      - name: Set up environment
-        run: |
-          sudo apt update
-          sudo apt install -y python3 python3-pip python3-setuptools python3-distutils unzip curl
+    - name: Checkout source
+      uses: actions/checkout@v4
 
-      - name: Download ImageBuilder
-        run: |
-          curl -L -o imagebuilder.tar.xz https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-          mkdir -p imagebuilder
-          tar -xJf imagebuilder.tar.xz -C imagebuilder --strip-components=1
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git ccache gettext libssl-dev xsltproc unzip python3-pip python3-setuptools python3-distutils
 
-      - name: Copy files into ImageBuilder
-        run: |
-          cp -r files imagebuilder/files || true
-          cp -r custom-packages imagebuilder/custom-packages || true
+    - name: Download ImageBuilder
+      run: |
+        wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        tar -xJf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+        mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic imagebuilder
 
-      - name: Run Build
-        run: |
-          cd imagebuilder
-          make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl luci-app-upnp luci-app-ddns iperf3 curl" FILES=files
+    - name: Copy files into ImageBuilder
+      run: |
+        cp -r files imagebuilder/files || true
 
-      - name: Upload firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: GL-MT3000-Firmware
-          path: imagebuilder/bin/targets/*/*/immortalwrt-*.bin
+    - name: Run Build
+      run: |
+        cd imagebuilder
+        make image PROFILE=glinet_gl-mt3000 PACKAGES="luci luci-ssl ip-full ipset iptables ip6tables kmod-mt7981e kmod-mt7981-firmware" FILES=files/
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: imagebuilder/bin/targets/*/*/immortalwrt-*.bin
 
 
 
