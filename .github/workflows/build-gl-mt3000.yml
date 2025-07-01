@@ -13,12 +13,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y curl unzip
+          sudo apt install -y curl unzip xz-utils
 
       - name: Download ImageBuilder
         run: |
           mkdir imagebuilder
-          curl -L -o ib.tar.xz https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/mediatek_filogic-glinet_gl-mt3000-immortalwrt-imagebuilder-20230806.tar.xz
+          curl -L -o ib.tar.xz https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/mediatek_filogic-glinet_gl-mt3000-immortalwrt-imagebuilder-20230915.tar.xz
           tar -xf ib.tar.xz -C imagebuilder --strip-components=1
 
       - name: Copy files into ImageBuilder
@@ -30,4 +30,5 @@ jobs:
         run: |
           chmod +x ./mediatek-filogic/build.sh
           PROFILE=glinet_gl-mt3000 ENABLE_PPPOE=false PPPOE_ACCOUNT=none PPPOE_PASSWORD=none INCLUDE_DOCKER=yes ./mediatek-filogic/build.sh
+
 
