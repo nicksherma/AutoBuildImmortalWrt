@@ -17,18 +17,17 @@ jobs:
 
       - name: Download ImageBuilder
         run: |
-          curl -L -o ib.tar.xz https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/mediatek_filogic-glinet_gl-mt3000-immortalwrt-imagebuilder-*.tar.xz
           mkdir imagebuilder
-          tar -xJf ib.tar.xz -C imagebuilder --strip-components=1
+          curl -L -o ib.tar.xz https://github.com/immortalwrt/immortalwrt/releases/download/v23.05.0/mediatek_filogic-glinet_gl-mt3000-immortalwrt-imagebuilder-20230806.tar.xz
+          tar -xf ib.tar.xz -C imagebuilder --strip-components=1
 
       - name: Copy files into ImageBuilder
         run: |
           mkdir -p imagebuilder/files
-          cp -r files/* imagebuilder/files/
+          cp -rf files/* imagebuilder/files/
 
       - name: Run Build Script
         run: |
           chmod +x ./mediatek-filogic/build.sh
-          cd imagebuilder
-          PROFILE=glinet_gl-mt3000 ENABLE_PPPOE=false PPPOE_ACCOUNT=none PPPOE_PASSWORD=none INCLUDE_DOCKER=yes ./../mediatek-filogic/build.sh
+          PROFILE=glinet_gl-mt3000 ENABLE_PPPOE=false PPPOE_ACCOUNT=none PPPOE_PASSWORD=none INCLUDE_DOCKER=yes ./mediatek-filogic/build.sh
 
