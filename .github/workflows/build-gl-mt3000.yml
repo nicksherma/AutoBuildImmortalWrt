@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: GL-MT3000-Firmware
-          path: imagebuilder/bin/targets/*/*/*-squashfs-sysupgrade.bin
+          path: imagebuilder/bin/targets/**/*.bin
 
 
 
