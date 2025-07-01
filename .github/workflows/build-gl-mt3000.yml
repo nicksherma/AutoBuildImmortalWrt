@@ -9,38 +9,43 @@ jobs:
 
     steps:
       - name: Set up job
-        run: echo "Starting build for GL-MT3000..."
+        run: echo "Starting build..."
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libncurses5-dev \
-            zlib1g-dev gawk git ccache gettext libssl-dev xsltproc \
-            rsync wget unzip python3-distutils
+          sudo apt-get install -y python3 python3-pip python3-venv \
+            build-essential libncurses5-dev zlib1g-dev gawk git ccache \
+            gettext libssl-dev xsltproc rsync wget unzip
 
       - name: Download ImageBuilder
         run: |
-          mkdir imagebuilder
+          mkdir -p imagebuilder
           cd imagebuilder
-          wget https://downloads.immortalwrt.org/snapshots/targets/mediatek/filogic/immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz
-          tar -xvf immortalwrt-imagebuilder-mediatek-filogic.Linux-x86_64.tar.xz --strip=1
+          wget https://downloads.openwrt.org/releases/23.05.3/targets/mediatek/filogic/openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
+          tar -xf openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
+          mv openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64 builder
 
       - name: Copy files into ImageBuilder
         run: |
-          mkdir -p imagebuilder/files/etc
-          # Add any custom files you want into imagebuilder/files/ if needed
-          echo "files copied"
+          mkdir -p imagebuilder/builder/files/etc
+          echo "set up files here if needed"
 
       - name: Run Build
         run: |
-          cd imagebuilder
-          make image PROFILE="glinet_gl-mt3000" PACKAGES="luci kmod-mt7915e kmod-usb3 kmod-usb-net kmod-usb-net-cdc-ether iperf3 ipset kmod-ipt-geoip kmod-ipt-nat kmod-nft-core kmod-nft-nat kmod-tun kmod-wireguard luci-app-openclash"
-
+          cd imagebuilder/builder
+          make image PROFILE=glinet_gl-mt3000 \
+            PACKAGES="luci luci-ssl luci-app-upnp luci-app-ddns \
+            iptables ip6tables kmod-usb-storage \
+            kmod-mt7915e kmod-mt7981-firmware \
+            dnsmasq-full ca-certificates curl iperf3"
+          
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
-          name: firmware
-          path: imagebuilder/bin/targets/*/*
+          name: openwrt-gl-mt3000
+          path: imagebuilder/builder/bin/targets/*/*/*.bin
+
 
 
 
