@@ -5,44 +5,40 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Set up job
-        run: echo "Starting build job..."
+    - name: Set up job
+      run: echo "Starting build process..."
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential clang flex g++ gawk gcc-multilib \
-            gettext git libncurses-dev libssl-dev \
-            python3 python3-pip python3-setuptools \
-            rsync unzip zlib1g-dev file wget
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential clang flex bison g++ gawk gcc-multilib g++-multilib \
+          gettext git libncurses-dev libssl-dev python3-distutils rsync unzip zlib1g-dev \
+          file wget libelf-dev ecj fastjar java-propose-classpath
 
-      - name: Download ImageBuilder
-        run: |
-          mkdir imagebuilder
-          cd imagebuilder
-          wget https://downloads.openwrt.org/releases/23.05.3/targets/mediatek/filogic/openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
-          tar -xJf openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
-          mv openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64 builder
+    - name: Download ImageBuilder
+      run: |
+        wget https://downloads.openwrt.org/releases/23.05.3/targets/mediatek/filogic/openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
+        tar -xvf openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64.tar.xz
+        mv openwrt-imagebuilder-23.05.3-mediatek-filogic.Linux-x86_64 imagebuilder
 
-      - name: Copy files into ImageBuilder
-        run: |
-          mkdir -p builder/files/etc/config
-          echo "option enabled '1'" > builder/files/etc/config/example_config
+    - name: Copy files into ImageBuilder
+      run: |
+        cp -r files imagebuilder/files || true
 
-      - name: Run Build
-        run: |
-          cd builder
-          make image PROFILE="gl-mt3000" PACKAGES="luci luci-ssl curl iperf3 ipset iptables iptables-nft ca-certificates kmod-mt7915e kmod-mt7981-firmware kmod-mt7981 kmod-mt7981e kmod-mt7986-firmware kmod-mt7986 kmod-usb-core kmod-usb3 kmod-usb2 block-mount kmod-fs-ext4 kmod-fs-vfat e2fsprogs luci-app-openclash"
+    - name: Run Build
+      run: |
+        cd imagebuilder
+        make image PROFILE=glinet_gl-mt3000 PACKAGES="luci luci-ssl iptables ip6tables kmod-mt7915e kmod-usb3 kmod-usb-net kmod-usb-net-cdc-ether kmod-usb-net-qmi-wwan kmod-usb-serial-option kmod-usb-serial kmod-usb-serial-wwan kmod-mt76 kmod-mt76-connac kmod-mt76-core kmod-mt76x02-common kmod-mt76x02-usb kmod-mt76x2-common kmod-mt76x2"
 
-      - name: Upload firmware
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenWrt-GL-MT3000
-          path: builder/bin/targets/mediatek/filogic/*.bin
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: imagebuilder/bin/targets/
+
 
 
 
