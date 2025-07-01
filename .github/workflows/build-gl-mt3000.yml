@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up environment
       run: |
@@ -35,10 +35,11 @@ jobs:
         make image PROFILE="gl-mt3000" PACKAGES="luci luci-ssl luci-app-upnp iperf3 ipset kmod-mt7921e kmod-mt7921u kmod-usb-net kmod-usb-net-cdc-ncm kmod-usb-net-cdc-ether kmod-usb-net-huawei-cdc-ncm kmod-usb-net-ipheth kmod-usb-net-kalmia kmod-usb-net-mcs7830 kmod-usb-net-rtl8150 kmod-usb-net-rtl8152"
 
     - name: Upload firmware
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: firmware
         path: imagebuilder/bin/targets/*/*/*.bin
+
 
 
 
