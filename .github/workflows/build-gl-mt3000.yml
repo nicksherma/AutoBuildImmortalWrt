@@ -1,36 +1,45 @@
-name: Build GL-MT3000 ImmortalWrt
+name: Build GL‑MT3000 ImmortalWrt
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y curl tar xz-utils python3-pip python3-setuptools
+        sudo apt-get install -y curl xz-utils make gcc g++ pkg-config
 
     - name: Download ImageBuilder
       run: |
         mkdir imagebuilder
         cd imagebuilder
-        curl -LO https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-        tar -xvf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-        mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64 builder
+        curl -L -o ib.tar.xz https://downloads.immortalwrt.org/releases/23.05-SNAPSHOT/targets/mediatek/filogic/immortalwrt-23.05-snapshot-*-mediatek-filogic-imagebuilder-*.tar.xz
+        tar xJf ib.tar.xz
+
+    - name: Copy pre‑config files
+      run: |
+        mkdir -p imagebuilder/builder/files
+        # Add any files into builder/files/ if needed
 
     - name: Run Build
       run: |
         cd imagebuilder/builder
-        make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl ip-full iperf3 curl bash coreutils screen htop nano openssh-sftp-server ca-certificates kmod-tun kmod-usb-net kmod-usb-net-cdc-ether kmod-mt7921e"
+        make image PROFILE=gl-mt3000 \
+          PACKAGES="luci openssl kmod-usb-core" \
+          FILES=files
 
     - name: Upload firmware
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: GL-MT3000-Firmware
+        name: gl-mt3000-firmware
         path: imagebuilder/builder/bin/targets/mediatek/filogic/*.bin
+
 
 
 
