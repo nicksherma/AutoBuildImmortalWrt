@@ -29,13 +29,14 @@ jobs:
       - name: Run Build
         run: |
           cd imagebuilder
-          make image PROFILE=gl-mt3000 PACKAGES="luci luci-ssl dnsmasq-full iptables ip6tables kmod-tun curl ca-certificates bash coreutils -odhcpd-ipv6only"
+          make image PROFILE=glinet_gl-mt3000 PACKAGES="luci luci-ssl dnsmasq-full iptables ip6tables kmod-tun curl ca-certificates bash coreutils -odhcpd-ipv6only"
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: firmware
           path: imagebuilder/bin/targets/*/*
+
 
 
 
