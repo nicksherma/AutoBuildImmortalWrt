@@ -19,7 +19,8 @@ jobs:
       - name: Download ImageBuilder
         run: |
           wget https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
-          tar -xf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+          tar -xvf immortalwrt-imagebuilder-23.05.0-mediatek-filogic.Linux-x86_64.tar.xz
+          ls -l
           mv immortalwrt-imagebuilder-23.05.0-mediatek-filogic imagebuilder
 
       - name: Copy files into ImageBuilder
@@ -36,6 +37,7 @@ jobs:
         with:
           name: firmware
           path: imagebuilder/bin/targets/*/*
+
 
 
 
