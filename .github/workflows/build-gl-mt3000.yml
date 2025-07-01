@@ -38,13 +38,14 @@ jobs:
       - name: Run Build
         run: |
           cd imagebuilder
-          make image PROFILE=glinet_gl-mt3000 PACKAGES="curl bash dropbear uci-defaults" FILES=files/
+          make image PROFILE=glinet_gl-mt3000 PACKAGES="curl bash dropbear" FILES=files/
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: GL-MT3000-firmware
           path: imagebuilder/bin/targets/**/**/*.bin
+
 
 
 
