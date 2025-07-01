@@ -10,20 +10,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies
+      - name: Run Build Script
         run: |
           sudo apt update
           sudo apt install -y curl
-
-      - name: Make build script executable
-        run: |
           chmod +x ./mediatek-filogic/build.sh
-
-      - name: Run Build Script
-        run: |
           PROFILE=glinet_gl-mt3000 \
           ENABLE_PPPOE=false \
           PPPOE_ACCOUNT=none \
           PPPOE_PASSWORD=none \
+          INCLUDE_DOCKER=yes \
           ./mediatek-filogic/build.sh
-
