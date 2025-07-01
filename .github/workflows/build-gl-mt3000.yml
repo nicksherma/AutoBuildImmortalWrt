@@ -26,13 +26,14 @@ jobs:
       - name: Run Build
         run: |
           cd imagebuilder
-          make image PROFILE=zyxel_nbg7815-pro PACKAGES="luci luci-ssl ip-full ipset iptables curl ca-certificates kmod-tun kmod-mt7981-firmware iperf3 -dnsmasq -odhcpd-ipv6only -ppp -ppp-mod-pppoe" FILES=files/
+          make image PROFILE=glinet_gl-mt3000 PACKAGES="luci luci-ssl ip-full ipset iptables curl ca-certificates kmod-tun kmod-mt7981-firmware iperf3 -dnsmasq -odhcpd-ipv6only -ppp -ppp-mod-pppoe" FILES=files/
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
           name: GL-MT3000-Firmware
           path: imagebuilder/bin/targets/*/*/*-squashfs-sysupgrade.bin
+
 
 
 
