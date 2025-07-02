@@ -1,5 +1,5 @@
 #!/bin/sh
-# Force enable Dropbear and set root password at boot
+# Start Dropbear and set password at boot
 
 uci set dropbear.@dropbear[0].enable='1'
 uci set dropbear.@dropbear[0].Port='22'
