@@ -1,10 +1,5 @@
 #!/bin/sh
-
-# Set root password manually
 echo -e "1234\n1234" | passwd root
-
-# Enable and start Dropbear
 /etc/init.d/dropbear enable
 /etc/init.d/dropbear start
-
 exit 0
