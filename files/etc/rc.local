@@ -13,4 +13,3 @@ uci commit dropbear
 echo -e "root\nroot" | passwd root
 
 exit 0
-
